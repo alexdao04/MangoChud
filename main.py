@@ -43,6 +43,15 @@ async def assign(ctx):
         await ctx.author.add_roles(role)
         await ctx.send(f"{ctx.author.mention} has been assigned the role {role.name}.")
     else:
-        await ctx.send(f"Role 'Rural Folk' not found.")
+        await ctx.send(f"Role {role.name} not found in this server.")
+
+@bot.command()
+async def unassign(ctx):
+    role = discord.utils.get(ctx.guild.roles, name = "Rural Folk")
+    if role in ctx.author.roles:
+        await ctx.author.remove_roles(role)
+        await ctx.send(f"{ctx.author.mention} has been unassigned the role {role.name}.")
+    else:
+        await ctx.send(f"{ctx.author.mention} does not have the role {role.name}.")
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
