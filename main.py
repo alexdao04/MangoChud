@@ -7,34 +7,59 @@ import os
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 
+if token is None: # ValueError does the same thing a try except or assert would do, but in less lines
+    raise ValueError("DISCORD_TOKEN not set in .env file") # raises an error when our .env file isn't set up
+# probably not the best way to do this, but the interpreter and the framework was bitching about it
+# so we just catch the error like patching flex tape on a leaking boat
+
+# this logs messages to a file called discord.log
+# logs bot activity, errors, etc (probably not gonna touch this for now)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
+# intents give the bot permission to do stuff (we handle this on the discord developer portal)
+# that makes it like 1000x easier to manage permissions rather than handling it in back end code
+# this is the bot object, which is the main interface for interacting with the discord API
+# we set the command prefix to '/' so that we can use commands like /assign, /
 bot = commands.Bot(command_prefix='/', intents=intents)
 
 @bot.event
-async def on_ready():
-    print(f'Mango chudder {bot.user.name} has joined the chat!')
+async def on_ready(): # just a startup message for when we run the bot
+    print(f'Mango chudder {bot.user} is starting up!')
 
-@bot.event
+@bot.event # when someone joins the server
 async def on_member_join(member):
     await member.send(f'Mango chudder {member.name} has joined the chat!')
+    
+# continue on, this is the part that i'm working on right now
 
 @bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
+async def on_message(message): # fun message handler
+    if message.author == bot.user: # if the message is from the bot itself, we ignore it
+        return # this prevents the bot from looping its own messages
     
-    if "akshant" in message.content.lower():
+    if "akshant" in message.content.lower(): # inside joke, sorry akshant you're the homie though
         await message.channel.send(f"{message.author.mention} - lower caste fremont indian detected")
-    
-    await bot.process_commands(message)
+        # neil's reaction told me everything i needed to know
+        # so we made it for real lol
 
-@bot.command()
-async def chud(ctx):
-    await ctx.send(f"Mango chudder {ctx.author.mention} is chudding in his goon cave as we speak!")
+    if "chud" in message.content.lower():
+        await message.channel.send(f"{message.author.mention} - mango chudder detected")
+        # this replaces the chud command, which is honestly kind of useless
+        # just a cool way to test this framework out, but we can save the commands for more essential things
+
+    await bot.process_commands(message)
+    # i dont know the deeper workings of this framework, but calling process_commands
+    # calls a premade function that processes any speech containing this keyword
+    # the reaction role message id, which is a message that has a reaction role
+    # is hardcoded here, so if you change the message id, you need to change it here too
+
+# this is where the commands are defined. we're going to structure this in a way
+# that we can find everything easily when we need to edit it later.
+# admittedly, i'm tempted to set the main.py up so that it jumps to other files
+# e.g. commands.py, events.py, etc. but for now, we keep this in one file until the need arises
 
 @bot.command()
 async def assign(ctx):
@@ -54,4 +79,4 @@ async def unassign(ctx):
     else:
         await ctx.send(f"{ctx.author.mention} does not have the role {role.name}.")
 
-bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+bot.run(token, log_handler=handler, log_level=logging.INFO)
