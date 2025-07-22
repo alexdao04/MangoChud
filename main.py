@@ -29,14 +29,12 @@ bot = commands.Bot(command_prefix='/', intents=intents)
 async def on_ready(): # just a startup message for when we run the bot
     print(f'Mango chudder {bot.user} is starting up!')
 
-@bot.event # when someone joins the server
+@bot.event # when someone joins the server.
 async def on_member_join(member):
     await member.send(f'Mango chudder {member.name} has joined the chat!')
-    
-# continue on, this is the part that i'm working on right now
 
 @bot.event
-async def on_message(message): # fun message handler
+async def on_message(message): # fun message handler, reads messages for keywords
     if message.author == bot.user: # if the message is from the bot itself, we ignore it
         return # this prevents the bot from looping its own messages
     
@@ -61,6 +59,15 @@ async def on_message(message): # fun message handler
 # admittedly, i'm tempted to set the main.py up so that it jumps to other files
 # e.g. commands.py, events.py, etc. but for now, we keep this in one file until the need arises
 
+# TODO: what we want to do here is assign a role to a user when they react to a message
+# treat it like it's integrated into the server at the moment as a functionality (and left in main.py)
+# but when this bot is expanded to work on multiple servers, we can move this to a separate file
+@bot.command()
+async def assign_role_when_reacted(ctx):
+    # we put the role logic here, but pass for now until implemented
+    pass
+
+# NOTE: THESE COMMANDS ARE THE GENERAL COMMANDS FOR THIS BOT
 @bot.command()
 async def assign(ctx): # self-explanatory, this command assigns a basic role for a user
     # the user can assign this role without any permissions being needed
