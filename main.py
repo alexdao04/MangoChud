@@ -10,6 +10,7 @@ from discord.ext import commands
 import logging
 from dotenv import load_dotenv
 import os
+import asyncio
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -71,8 +72,46 @@ async def on_message(message): # fun message handler, reads messages for keyword
 # but when this bot is expanded to work on multiple servers, we can move this to a separate file
 @bot.command()
 async def assign_role_when_reacted(ctx):
-    # we put the role logic here, but pass for now until implemented
-    pass
+    """
+    Sends a message prompting the user to react with a thumbs up emoji,
+    and assigns the corresponding role based on the reaction.
+    Usage: /assign_role_when_reacted
+    """
+    
+    REACTION_ROLES = {
+        "👍": "thumbs_up",
+    }
+
+    message = await ctx.send("React to this message with a thumbs up to assign a role.")
+    # if the number of reactions grows, consider batching or optimizing this process for better performance.
+    for reaction in REACTION_ROLES.keys():
+        await message.add_reaction(reaction)
+        # i'm surprised it's that simple, but that's what the wrapper does..
+        # i'm curious how the api calls work under the hood. thats what i hate about python
+        # it makes things easier to use, but you dont actually understand what's happening
+
+    def reaction_check(reaction, user):
+        return user == ctx.author and str(reaction.emoji) in REACTION_ROLES
+    # this is a check to see if the reaction is from the user who sent the command
+    try:
+        role_name = REACTION_ROLES[str(reaction.emoji)]
+        role = discord.utils.get(ctx.guild.roles, name=role_name)
+        if role:
+            try:
+                await ctx.author.add_roles(role)
+                await ctx.send(f"{ctx.author.mention} has been assigned the role {role.name}.")
+            except discord.Forbidden:
+                logging.error(f"Bot lacks permission to assign role '{role_name}' to {ctx.author}.")
+                await ctx.send(f"Sorry, I don't have permission to assign the role {role.name}.")
+            except Exception as e:
+                logging.error(f"Error assigning role '{role_name}' to {ctx.author}: {e}")
+                await ctx.send(f"An error occurred while assigning the role {role.name}.")
+        else:
+            logging.warning(f"Role '{role_name}' not found in server '{ctx.guild.name}'.")
+            await ctx.send(f"Role {role_name} not found in this server.")
+            await ctx.send(f"Role {role_name} not found in this server.")
+    except asyncio.TimeoutError:
+        await ctx.send(f"{ctx.author.mention}, you took too long to react! Please try again.")
 
 # NOTE: THESE COMMANDS ARE THE GENERAL COMMANDS FOR THIS BOT
 @bot.command()
