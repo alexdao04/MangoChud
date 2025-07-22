@@ -62,7 +62,9 @@ async def on_message(message): # fun message handler
 # e.g. commands.py, events.py, etc. but for now, we keep this in one file until the need arises
 
 @bot.command()
-async def assign(ctx):
+async def assign(ctx): # self-explanatory, this command assigns a basic role for a user
+    # the user can assign this role without any permissions being needed
+    # basic implementation, we can expand on this slightly later
     role = discord.utils.get(ctx.guild.roles, name = "Rural Folk")
     if role:
         await ctx.author.add_roles(role)
@@ -71,7 +73,8 @@ async def assign(ctx):
         await ctx.send(f"Role {role.name} not found in this server.")
 
 @bot.command()
-async def unassign(ctx):
+async def unassign(ctx): # self-explanatory, this command unassigns a basic role for a user
+    # in it's most basic form, the user can remove their role without any permissions
     role = discord.utils.get(ctx.guild.roles, name = "Rural Folk")
     if role in ctx.author.roles:
         await ctx.author.remove_roles(role)
@@ -80,3 +83,5 @@ async def unassign(ctx):
         await ctx.send(f"{ctx.author.mention} does not have the role {role.name}.")
 
 bot.run(token, log_handler=handler, log_level=logging.INFO)
+# we run the bot at the end with the env file token
+# after we've defined all our events and commands that this bot should support
