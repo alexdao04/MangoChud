@@ -1,3 +1,10 @@
+# MangoChud v0.1: A bot originally conceived for the Mango Chudney discord server.
+# This bot is a general-purpose server bot for moderation, role assignment, fun interactions, and more.
+
+# I built this bot using the discord.py library, a Python wrapper that makes Discord API calls easy.
+# This bot is by "Alexander Dao" (me), and is open source under MIT license.
+
+# import main.py packages
 import discord
 from discord.ext import commands
 import logging
