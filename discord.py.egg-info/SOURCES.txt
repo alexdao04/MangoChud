@@ -1,8 +1,9 @@
 LICENSE
 MANIFEST.in
-README.rst
+README.md
 pyproject.toml
 requirements.txt
+setup.cfg
 setup.py
 discord/__init__.py
 discord/__main__.py
